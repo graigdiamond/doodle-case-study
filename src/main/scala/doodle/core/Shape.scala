@@ -1,6 +1,7 @@
 package doodle.core
 
 import doodle.backend.Canvas
+import doodle.jvm.Java2DCanvas
 
 /**
   * Created by graig on 5/7/17.
@@ -23,7 +24,7 @@ sealed trait Shape {
 
   def draw(canvas: Canvas, originX: Double, originY: Double): Unit = this match{
     case Circle(r) => canvas.circle(originX,originY,r)
-    case Rectangle(w,h) => canvas.rectangle(-w/2d,h/2d,w/2d,h/2d)
+    case Rectangle(w,h) => canvas.rectangle(originX - w/2d,originY - h/2d,w,h)
     case Above(t,b) => {
       val box = this.boundingBox
       val tBox = t.boundingBox
@@ -56,3 +57,13 @@ final case class Rectangle(width: Double, height: Double) extends Shape
 final case class On(top: Shape, bottom: Shape) extends Shape
 final case class Above(top: Shape, bottom: Shape) extends Shape
 final case class Beside(left: Shape, right: Shape) extends Shape
+
+object test{
+  val canvas = Java2DCanvas.canvas
+  canvas.setSize(500,500)
+  canvas.setStroke(Stroke(1,Color.black,Line.Cap.Round,Line.Join.Round))
+  val drawingA = Circle(10) beside Circle(10)
+  val drawingB = drawingA above drawingA
+  drawingB.draw(canvas)
+  canvas.stroke()
+}
